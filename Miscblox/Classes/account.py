@@ -1,7 +1,8 @@
 import httpx
-from Miscblox.Functions.logger import logger
-from Miscblox.Classes.Account.Information import AccountInformation
-from Miscblox.Classes.Account.Settings import AccountSettings
+from ..Functions.logger import logger
+from .Account.Information import AccountInformation
+from .Account.Settings import AccountSettings
+from .Account.adverts import AdvertConfiguration
 
 import asyncio
 
@@ -92,3 +93,29 @@ class RobloxAccount:
         except Exception as e:
             self.logger.error(f"Something went wrong when fetching the authenticated user: {e}")
             return None
+        
+    async def get_user_by_id(self, roblox_id):
+        if self.cookie is None:
+            self.logger.warning("You need to log in first.")
+            return None
+        
+        if isinstance(roblox_id, int) is False:
+            return self.logger.error("Please provide an Integer.")
+        
+        url = f"https://users.roblox.com/v1/users/{roblox_id}"
+        try:
+            try:
+                authenticated_response = await self.client.get(url=url)
+            except Exception as e:
+                self.logger.error(f"Something went wrong when fetching the authenticated user: {e}")
+                return None              
+            if authenticated_response.status_code != 200:
+                self.logger.error("Could not find that user.")
+                return None
+            
+            return authenticated_response.json()
+        
+        except Exception as e:
+            self.logger.error(f"Something went wrong when fetching the authenticated user: {e}")
+            return None
+

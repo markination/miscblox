@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="Miscblox",                 
-    version="1.0.0",                     
+    version="1.0.1",                     
     author="mark.api",                    
     description="An API wrapper for the Roblox that supports endpoints that other API wrappers don't.",
     long_description=long_description,      
