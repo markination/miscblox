@@ -14,7 +14,7 @@ class RobloxAccount:
         self.logger = logger
         self.information = None
         self.settings = None
-    
+
     async def logout(self):
         if self.cookie is None:
             self.logger.warning("You are not logged in.")
@@ -22,12 +22,12 @@ class RobloxAccount:
         self.cookie = None
         self.client = None
         self.logger.info("Logged out successfully.")
-    
+
     async def login(self, cookie: str):
         if self.cookie is not None:
             self.logger.warning("There is already a session active.")
             return
-        
+
         self.logger.info("Logging in...")
         self.client = httpx.AsyncClient(cookies={".ROBLOSECURITY": cookie})
         self.cookie = cookie
@@ -36,19 +36,19 @@ class RobloxAccount:
             self.logger.info(f"Successfully logged in as {response['name']} ({response['id']})")
             self.information = AccountInformation(cookie=self.cookie)
             self.settings = AccountSettings(cookie=self.cookie)
-    
+
     async def get_minimal_authenticated_info(self):
         if self.cookie is None:
             self.logger.warning("You need to log in first.")
             return None
-        
+
         url = "https://users.roblox.com/v1/users/authenticated"
         try:
-            
+
             response = await self.client.get(url)
             if response.status_code == 200:
                 return response.json()
-            
+
             else:
                 self.logger.error(f"Failed to get authenticated user info: {response.status_code}")
                 return None
@@ -58,20 +58,20 @@ class RobloxAccount:
         except httpx.RequestError as exc:
             self.logger.error(f"Request error: {exc}")
             return None
-        
-            
+
+
     async def get_all_authenticated_info(self):
         if self.cookie is None:
             self.logger.warning("You need to log in first.")
             return None
-        
+
         user_url = "https://users.roblox.com/v1/users/authenticated"
         try:
             authenticated_response = await self.client.get(user_url)
             if authenticated_response.status_code != 200:
                 self.logger.error("Could not fetch the authenticated user.")
                 return None
-            
+
             authenticated_data = authenticated_response.json()
             user_id = authenticated_data.get('id')
             if user_id is None:
@@ -89,19 +89,19 @@ class RobloxAccount:
             except Exception as e:
                 self.logger.error(f"Something went wrong when fetching the authenticated account's information: {e}")
                 return None
-        
+
         except Exception as e:
             self.logger.error(f"Something went wrong when fetching the authenticated user: {e}")
             return None
-        
+
     async def get_user_by_id(self, roblox_id):
         if self.cookie is None:
             self.logger.warning("You need to log in first.")
             return None
-        
+
         if isinstance(roblox_id, int) is False:
             return self.logger.error("Please provide an Integer.")
-        
+
         url = f"https://users.roblox.com/v1/users/{roblox_id}"
         try:
             try:
@@ -112,9 +112,9 @@ class RobloxAccount:
             if authenticated_response.status_code != 200:
                 self.logger.error("Could not find that user.")
                 return None
-            
+
             return authenticated_response.json()
-        
+
         except Exception as e:
             self.logger.error(f"Something went wrong when fetching the authenticated user: {e}")
             return None
