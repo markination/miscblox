@@ -2,6 +2,8 @@ import asyncio
 import httpx
 from Miscblox.Functions.logger import logger
 import json
+from Miscblox.Functions.exceptions import RobloxAPIError, RobloxAccountUnauthorized
+
 
 class AccountInformation():
     def __init__(self, cookie):
@@ -10,14 +12,13 @@ class AccountInformation():
         self.base_url = "https://accountinformation.roblox.com"
         self.client = httpx.AsyncClient(cookies={".ROBLOSECURITY": cookie})
         if self.cookie is None:
-            self.logger.error("Please login with your Roblox account.")
+            raise RobloxAccountUnauthorized
     
 
     async def get_birthdate(self):
         try:
             if self.cookie is None:
-                self.logger.error("Please login with your Roblox account.")
-                return None
+                raise RobloxAccountUnauthorized
             
             request = await self.client.get(f"{self.base_url}/v1/birthdate")
             if request.status_code != 200:
@@ -35,8 +36,7 @@ class AccountInformation():
     async def update_birthdate(self, birthMonth: int, birthDay: int, birthYear: int,*, password: str):
         try:
             if self.cookie is None:
-                self.logger.error("Please login with your Roblox account.")
-                return None
+                raise RobloxAccountUnauthorized
             
 
             
@@ -61,8 +61,8 @@ class AccountInformation():
     async def get_description(self):
         try:
             if self.cookie is None:
-                return self.logger.error("Please login with your roblox account.")
-            
+                raise RobloxAccountUnauthorized
+                        
             request = await self.client.get(f"{self.base_url}/v1/description")
             if request.status_code != 200:
                 return self.logger.error("Something went wrong when connecting to Roblox's API.")
@@ -77,8 +77,8 @@ class AccountInformation():
     async def update_description(self,*, description: str):
         try:
             if self.cookie is None:
-                return self.logger.error("Please login with your roblox account.")
- 
+                raise RobloxAccountUnauthorized
+
             request = await self.client.post(f"{self.base_url}/v1/description", json={"description": description})
             if request.status_code != 200:
                 if request.status_code == 403:
